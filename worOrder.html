@@ -158,7 +158,19 @@
       // إرسال البيانات (⚠️ تعديل الرابط حسب Web App URL)
       fetch('https://script.google.com/macros/s/AKfycbxkSKSm6OZ5tcAoUrrC-QtGfZZbF_FacGlDleaB2GGIjyNiB-nk5wtemBJtUymKzXrCMg/exec', {
         method: 'POST',
-        body: formData
+       headers: {
+    'Content-Type': 'application/json',
+  },
+    body: JSON.stringify({
+    clientName: document.getElementById('clientName').value,
+    email: document.getElementById('email').value,
+    serviceType: document.getElementById('serviceType').value,
+    visitDate: document.getElementById('visitDate').value,
+    workDetails: document.getElementById('workDetails').value,
+    technicianName: document.getElementById('technicianName').value,
+    reportFile: document.getElementById('reportFile').files[0],
+    signatureFile: document.getElementById('signatureFile').files[0],
+  })
       })
         .then(response => response.text())
         .then(data => {
