@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>أمر عمل</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>نموذج تقرير الخدمة</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
   <style>
     body {
       background-color: #f8f9fa;
@@ -33,32 +32,81 @@
       color: #002147;
       margin-bottom: 20px;
     }
+
+    input[type="file"] {
+      direction: ltr;
+    }
   </style>
 </head>
 <body>
-
   <div class="container py-5">
     <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
+      <div class="col-lg-8">
         <div class="form-section">
-          <h2 class="text-center">نموذج التواصل</h2>
-          <form id="contactForm">
+          <h2 class="text-center">نموذج تقرير الخدمة</h2>
+          <form id="serviceForm">
+            <!-- Timestamp (مخفي) -->
+            <input type="hidden" id="timestamp" name="timestamp">
+
+            <!-- الاسم -->
             <div class="mb-3">
-              <label for="name" class="form-label">الاسم الكامل</label>
-              <input type="text" class="form-control" id="name" required>
+              <label for="clientName" class="form-label">اسم العميل</label>
+              <input type="text" class="form-control" id="clientName" required>
             </div>
+
+            <!-- البريد الإلكتروني -->
             <div class="mb-3">
               <label for="email" class="form-label">البريد الإلكتروني</label>
               <input type="email" class="form-control" id="email" required>
             </div>
+
+            <!-- نوع الخدمة -->
             <div class="mb-3">
-              <label for="message" class="form-label">الرسالة</label>
-              <textarea class="form-control" id="message" rows="4" required></textarea>
+              <label for="serviceType" class="form-label">نوع الخدمة</label>
+              <select class="form-select" id="serviceType" required>
+                <option value="">اختر نوع الخدمة</option>
+                <option value="صيانة">صيانة</option>
+                <option value="تركيب">تركيب</option>
+                <option value="فحص">فحص</option>
+                <option value="أخرى">أخرى</option>
+              </select>
             </div>
+
+            <!-- تاريخ الزيارة -->
+            <div class="mb-3">
+              <label for="visitDate" class="form-label">تاريخ الزيارة</label>
+              <input type="date" class="form-control" id="visitDate" required>
+            </div>
+
+            <!-- تفاصيل العمل -->
+            <div class="mb-3">
+              <label for="workDetails" class="form-label">تفاصيل العمل</label>
+              <textarea class="form-control" id="workDetails" rows="4" required></textarea>
+            </div>
+
+            <!-- اسم الفني -->
+            <div class="mb-3">
+              <label for="technicianName" class="form-label">اسم الفني</label>
+              <input type="text" class="form-control" id="technicianName" required>
+            </div>
+
+            <!-- ارفاق التقرير المصور -->
+            <div class="mb-3">
+              <label for="reportFile" class="form-label">إرفاق التقرير المصور</label>
+              <input type="file" class="form-control" id="reportFile" accept="image/*,application/pdf" required>
+            </div>
+
+            <!-- توقيع العميل -->
+            <div class="mb-3">
+              <label for="signatureFile" class="form-label">توقيع العميل</label>
+              <input type="file" class="form-control" id="signatureFile" accept="image/*" required>
+            </div>
+
             <div class="d-grid">
-              <button type="submit" class="btn btn-kemsco">إرسال</button>
+              <button type="submit" class="btn btn-kemsco">إرسال التقرير</button>
             </div>
           </form>
+
           <div id="statusMessage" class="mt-3 text-center"></div>
         </div>
       </div>
@@ -69,24 +117,35 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        message: document.getElementById('message').value
-      };
+    document.addEventListener('DOMContentLoaded', function() {
+      // تعبئة حقل timestamp تلقائيًا
+      const now = new Date().toLocaleString('ar-EG');
+      document.getElementById('timestamp').value = now;
+    });
 
+    document.getElementById('serviceForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('timestamp', document.getElementById('timestamp').value);
+      formData.append('clientName', document.getElementById('clientName').value);
+      formData.append('email', document.getElementById('email').value);
+      formData.append('serviceType', document.getElementById('serviceType').value);
+      formData.append('visitDate', document.getElementById('visitDate').value);
+      formData.append('workDetails', document.getElementById('workDetails').value);
+      formData.append('technicianName', document.getElementById('technicianName').value);
+      formData.append('reportFile', document.getElementById('reportFile').files[0]);
+      formData.append('signatureFile', document.getElementById('signatureFile').files[0]);
+
+      // ملاحظة: الكود التالي لن يرسل الملفات إلى Google Sheets بدون خادم وسيط
       fetch('https://script.google.com/macros/s/AKfycbwyrhaX033cbDimFlADMu581JOxHk-L8ylBI63OaTJo-4pKe3FKm3wJ4XbVb_9NvcxHKQ/exec', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: formData
       })
-      .then(response => response.json())
+      .then(response => response.text())
       .then(data => {
-        document.getElementById('statusMessage').textContent = 'تم الإرسال بنجاح ✅';
-        document.getElementById('contactForm').reset();
+        document.getElementById('statusMessage').textContent = 'تم إرسال التقرير بنجاح ✅';
+        document.getElementById('serviceForm').reset();
       })
       .catch(error => {
         document.getElementById('statusMessage').textContent = 'حدث خطأ أثناء الإرسال ❌';
